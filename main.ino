@@ -1,10 +1,9 @@
-
 const int buttonPin = 1;
 const int clock = 2;
 const int data = 3;
 const uint8_t red = 12;
 const uint8_t green = 13;
-const uint8_t blue = 11; 
+const uint8_t yellow = 11; 
 uint8_t digits[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f }; 
 void setup() 
 {
@@ -13,7 +12,7 @@ void setup()
   pinMode(data, OUTPUT);
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
-  pinMode(blue, OUTPUT);
+  pinMode(yellow, OUTPUT);
   setupInterrupt();
   start();
   writeValue(0x8f);
@@ -51,13 +50,16 @@ void loop()
 }
 void handleButton()
 {
-  const unsigned long sprintDuration = 70000; // change time
+  const unsigned long sprintDuration = 50000; // change time
   static uint8_t previousButtonState = LOW;
 
   uint8_t buttonState = digitalRead(buttonPin);
   if(buttonState == LOW && previousButtonState == HIGH)
   {
     time = sprintDuration;
+    digitalWrite(yellow, HIGH);
+    digitalWrite(green, LOW);
+    delay(500);
   }
 
   previousButtonState = buttonState;
@@ -71,11 +73,13 @@ void displayTime()
   {
     digitalWrite(red, HIGH);
     digitalWrite(green, LOW);
+    digitalWrite(yellow, LOW);
   }
   else
   {
     digitalWrite(red, LOW);
     digitalWrite(green, HIGH);
+    digitalWrite(yellow, LOW);
   }
    write(digits[minutes / 10], digits[minutes % 10] | ((seconds & 0x01) << 7) , digits[seconds / 10], digits[seconds % 10]);
 }
@@ -95,7 +99,7 @@ void write(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth)
 }
 void start(void)
 {
-  digitalWrite(clock,HIGH);//send start signal to TM1637
+  digitalWrite(clock,HIGH);
   digitalWrite(data,HIGH);
   delayMicroseconds(5);
   
